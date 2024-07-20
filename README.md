@@ -1,2 +1,2 @@
-# terminalSnake
-Terminal Snake game written in elixir
+# rotatingCube
+Terminal ASCII rotating cube written in elixir
