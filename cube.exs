@@ -32,7 +32,8 @@ defmodule Cube do
   def draw(vertices) do
     Enum.map(vertices, fn vertex ->
       [x, y, _z] = Enum.map(vertex, fn coordinate -> Float.floor(coordinate) end)
-      IO.write(IO.ANSI.cursor(round(elem(:io.rows(), 1)/2 - y), round(x + elem(:io.columns(), 1)/2)))
+      yScale = 0.75
+      IO.write(IO.ANSI.cursor(round(elem(:io.rows(), 1)/2 - y * yScale), round(x + elem(:io.columns(), 1)/2)))
       IO.write("$")
     end)
     IO.write("\e[?25l")
