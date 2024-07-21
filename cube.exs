@@ -15,13 +15,13 @@ defmodule Cube do
   end
 
   def loop(vertices) do
-    theta = 0.02
+    {a, b, c} = {0.01, 0.02, 0.01}
     rot = Enum.map(vertices, fn vertex ->
       [x, y, z] = vertex
       p = []
-      p = [calculateZ(x, y, z, theta) | p]
-      p = [calculateY(x, y, z, theta) | p]
-      p = [calculateX(x, y, z, theta) | p]
+      p = [calculateZ(x, y, z, a, b) | p]
+      p = [calculateY(x, y, z, a, b, c) | p]
+      p = [calculateX(x, y, z, a, b, c) | p]
       p
     end)
 
@@ -40,22 +40,22 @@ defmodule Cube do
     IO.write(IO.ANSI.clear())
   end
 
-  def calculateX(x, y, z, theta) do
-    sin = :math.sin(theta)
-    cos = :math.cos(theta)
-    x * cos * cos - y * cos * sin + z * sin
+  def calculateX(x, y, z, a, b, c) do
+    [sinA, sinB, sinC] = Enum.map([a, b, c], & :math.sin/1)
+    [cosA, cosB, cosC] = Enum.map([a, b, c], & :math.cos/1)
+    y * sinA * sinB * cosC - z * cosA * sinB * cosC + y * cosA * sinC + z * sinA * sinC + x * cosB * cosC
   end
 
-  def calculateY(x, y, z, theta) do
-    sin = :math.sin(theta)
-    cos = :math.cos(theta)
-    x * (sin * sin * cos + cos * sin) + y * (cos * cos - sin * sin * sin) - z * sin * cos
+  def calculateY(x, y, z, a, b, c) do
+    [sinA, sinB, sinC] = Enum.map([a, b, c], & :math.sin/1)
+    [cosA, cosB, cosC] = Enum.map([a, b, c], & :math.cos/1)
+    y * cosA * cosC + z * sinA * cosC - y * sinA * sinB * sinC + z * cosA * sinB * sinC - x * cosB * sinC
   end
 
-  def calculateZ(x, y, z, theta) do
-    sin = :math.sin(theta)
-    cos = :math.cos(theta)
-    x * (sin * sin - cos * cos * sin) + y * (sin * sin * cos + sin * cos) + z * cos * cos
+  def calculateZ(x, y, z, a, b) do
+    [sinA, sinB] = Enum.map([a, b], & :math.sin/1)
+    [cosA, cosB] = Enum.map([a, b], & :math.cos/1)
+    z * cosA * cosB - y * sinA * cosB + x * sinB
   end
 
 end
