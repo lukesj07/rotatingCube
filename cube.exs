@@ -10,12 +10,12 @@ defmodule Cube do
       [10, 10, -10],
       [10, -10, -10]
     ]
-    
+
     loop(vertices)
   end
 
   def loop(vertices) do
-    theta = 0.01
+    theta = 0.02
     rot = Enum.map(vertices, fn vertex ->
       [x, y, z] = vertex
       p = []
@@ -35,7 +35,8 @@ defmodule Cube do
       IO.write(IO.ANSI.cursor(round(elem(:io.rows(), 1)/2 - y), round(x + elem(:io.columns(), 1)/2)))
       IO.write("$")
     end)
-    :timer.sleep(10)
+    IO.write("\e[?25l")
+    :timer.sleep(20)
     IO.write(IO.ANSI.clear())
   end
 
@@ -56,6 +57,7 @@ defmodule Cube do
     cos = :math.cos(theta)
     x * (sin * sin - cos * cos * sin) + y * (sin * sin * cos + sin * cos) + z * cos * cos
   end
+
 end
 
 Cube.main()
