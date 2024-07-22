@@ -10,6 +10,8 @@ defmodule Cube do
       [10, 10, -10],
       [10, -10, -10]
     ]
+
+    IO.write("\e[?25l")
     loop(vertices, calculateIndices(vertices, [], 0, 0))
   end
 
@@ -30,7 +32,7 @@ defmodule Cube do
   end
   
   def shared(v1, v2) do
-    Enum.sum(for i <- 0..(length(v1)-1), do: if Enum.at(v1, i) == Enum.at(v2, i), do: 1, else: 0)
+    Enum.sum(for i <- 0..(length(v1)-1), do: (if Enum.at(v1, i) == Enum.at(v2, i), do: 1, else: 0))
   end
 
   def loop(vertices, connect) do
@@ -56,23 +58,17 @@ defmodule Cube do
       yScale = 0.75
       [screenY1, screenY2] = Enum.map([y1, y2], fn y -> round(elem(:io.rows(), 1)/2 - y * yScale) end)
       [screenX1, screenX2] = Enum.map([x1, x2], fn x -> round(x + elem(:io.columns(), 1)/2) end)
-      if screenX1 != screenX2 do
-        m = (screenY2 - screenY1) / (screenX2 - screenX1)
-        b = screenY2 - m * screenX2
-        for x <- ([screenX1, screenX2] |> Enum.min())..([screenX1, screenX2] |> Enum.max()) do
-          py = round(m * x + b)
-          IO.write(IO.ANSI.cursor(py, x))
-          IO.write("$")
-        end
-      else 
-        for y <- ([screenY1, screenY2] |> Enum.min())..([screenY1, screenY2] |> Enum.max()) do
-          IO.write(IO.ANSI.cursor(y, screenX1))
-          IO.write("$")
-        end
+      
+      d = round(:math.sqrt(:math.pow((screenX2 - screenX1), 2) + :math.pow((screenY2 - screenY1), 2)))
+      for s <- 0..d do
+        t = if d == 0, do: 0, else: s/d
+        x = round(screenX1 + t * (screenX2 - screenX1))
+        y = round(screenY1 + t * (screenY2 - screenY1))
+        IO.write(IO.ANSI.cursor(y, x))
+        IO.write("$")
       end
     end)
-    IO.write("\e[?25l")
-    :timer.sleep(40)
+    :timer.sleep(100)
     IO.write(IO.ANSI.clear())
   end
 
