@@ -1,2 +1,2 @@
 # rotatingCube
-Terminal ASCII rotating cube written in elixir
+Rotating cube rendered in the terminal written in elixir
