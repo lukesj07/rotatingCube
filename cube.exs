@@ -23,28 +23,15 @@ defmodule Cube do
   end
   
   def calculateIndices(vertices, indices, i1, i2) do
-    if calculateSharedValues(Enum.at(vertices, i1), Enum.at(vertices, i2)) == 2 do
+    if shared(Enum.at(vertices, i1), Enum.at(vertices, i2)) == 2 do
       calculateIndices(vertices, indices ++ [[i1, i2]], i1, i2+1)
     else
       calculateIndices(vertices, indices, i1, i2+1)
     end
   end
-
-  def calculateSharedValues(v1, v2) do
-    [x1, y1, z1] = v1
-    [x2, y2, z2] = v2
-    if x1 == x2 and y1 == y2 do
-      True
-    else 
-      if x1 == x2 and z1 == z2 do
-        True
-      else
-        if y1 == y2 and z1 == z2 do
-          True
-        end
-      end
-    end
-    False
+  
+  def shared(v1, v2) do
+    Enum.sum(for i <- 0..(length(v1)-1), do: if Enum.at(v1, i) == Enum.at(v2, i), do: 1, else: 0)
   end
 
   def loop(vertices, connect) do
@@ -80,6 +67,9 @@ defmodule Cube do
         end
       end
     end)
+    IO.write("\e[?25l")
+    :timer.sleep(20)
+    IO.write(IO.ANSI.clear())
   end
 
   def calculateX(x, y, z, a, b, c) do
