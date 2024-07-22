@@ -31,13 +31,20 @@ defmodule Cube do
   end
 
   def calculateSharedValues(v1, v2) do
-    Enum.sum(for i <- 0..(length(v1)-1) do
-      if Enum.at(v1, i) == Enum.at(v2, i) do
-        1
+    [x1, y1, z1] = v1
+    [x2, y2, z2] = v2
+    if x1 == x2 and y1 == y2 do
+      True
+    else 
+      if x1 == x2 and z1 == z2 do
+        True
       else
-        0
+        if y1 == y2 and z1 == z2 do
+          True
+        end
       end
-    end)
+    end
+    False
   end
 
   def loop(vertices, connect) do
