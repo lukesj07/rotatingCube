@@ -10,7 +10,6 @@ defmodule Cube do
       [10, 10, -10],
       [10, -10, -10]
     ]
-    # IO.inspect(calculateIndices(vertices, [], 0, 0))
     loop(vertices, calculateIndices(vertices, [], 0, 0))
   end
 
@@ -35,7 +34,7 @@ defmodule Cube do
   end
 
   def loop(vertices, connect) do
-    {a, b, c} = {0.05, 0.03, 0.01}
+    {a, b, c} = {0.1, 0.06, 0.02}
     rot = Enum.map(vertices, fn vertex ->
       [x, y, z] = vertex
       p = []
@@ -60,15 +59,20 @@ defmodule Cube do
       if screenX1 != screenX2 do
         m = (screenY2 - screenY1) / (screenX2 - screenX1)
         b = screenY2 - m * screenX2
-        for i <- ([screenX1, screenX2] |> Enum.min())..([screenX1, screenX2] |> Enum.max()) do
-          py = round(m * i + b)
-          IO.write(IO.ANSI.cursor(py, i))
-          IO.write("~")
+        for x <- ([screenX1, screenX2] |> Enum.min())..([screenX1, screenX2] |> Enum.max()) do
+          py = round(m * x + b)
+          IO.write(IO.ANSI.cursor(py, x))
+          IO.write("$")
+        end
+      else 
+        for y <- ([screenY1, screenY2] |> Enum.min())..([screenY1, screenY2] |> Enum.max()) do
+          IO.write(IO.ANSI.cursor(y, screenX1))
+          IO.write("$")
         end
       end
     end)
     IO.write("\e[?25l")
-    :timer.sleep(20)
+    :timer.sleep(40)
     IO.write(IO.ANSI.clear())
   end
 
