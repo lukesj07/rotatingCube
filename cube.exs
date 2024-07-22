@@ -10,16 +10,10 @@ defmodule Cube do
       [10, 10, -10],
       [10, -10, -10]
     ]
+    # IO.inspect(calculateIndices(vertices, [], 0, 0))
     loop(vertices, calculateIndices(vertices, [], 0, 0))
   end
-  """
-  def calculateIndices(vertices, indices, i1, i2) do    
-    if i1 == length(vertices), do: indices
-    if i2 == length(vertices), do: calculateIndices(vertices, indices, i1+1, 0)
-    if MapSet.size(MapSet.new(Enum.at(vertices, i1) ++ Enum.at(vertices, i2))) == 4, do: calculateIndices(vertices, indices ++ [i1, i2], i1, i2+1)
-    calculateIndices(vertices, indices, i1, i2+1)
-  end
-  """
+
   def calculateIndices(vertices, indices, i1, _i2) when i1 == length(vertices) do
     indices
   end
@@ -29,12 +23,21 @@ defmodule Cube do
   end
   
   def calculateIndices(vertices, indices, i1, i2) do
-    IO.inspect([i1, i2])
-    if MapSet.size(MapSet.new(Enum.at(vertices, i1) ++ Enum.at(vertices, i2))) == 4 do
-      calculateIndices(vertices, indices ++ [i1, i2], i1, i2+1)
+    if calculateSharedValues(Enum.at(vertices, i1), Enum.at(vertices, i2)) == 2 do
+      calculateIndices(vertices, indices ++ [[i1, i2]], i1, i2+1)
     else
       calculateIndices(vertices, indices, i1, i2+1)
     end
+  end
+
+  def calculateSharedValues(v1, v2) do
+    Enum.sum(for i <- 0..(length(v1)-1) do
+      if Enum.at(v1, i) == Enum.at(v2, i) do
+        1
+      else
+        0
+      end
+    end)
   end
 
   def loop(vertices, connect) do
