@@ -1,21 +1,22 @@
 defmodule Cube do
   def main() do
-    vertices = for x <- [-10, 10], y <- [-10, 10], z <- [-10, 10], do: [x, y, z]
     {a, b, c} = {0.01, 0.06, 0.03}
+    {halfX, halfY, halfZ} = {10, 10, 10}
+    vertices = for x <- [-halfX, halfX], y <- [-halfY, halfY], z <- [-halfZ, halfZ], do: [x, y, z]
     IO.write("\e[?25l")
-    loop(vertices, calculateIndices(vertices, [], 0, 0), Enum.map([a, b, c], & :math.sin/1), Enum.map([a, b, c], & :math.cos/1))
+    loop(vertices, calculateConnects(vertices, [], 0, 0), Enum.map([a, b, c], & :math.sin/1), Enum.map([a, b, c], & :math.cos/1))
   end
-
-  def calculateIndices(vertices, indices, i1, _i2) when i1 == length(vertices), do: indices
-  def calculateIndices(vertices, indices, i1, i2) when i2 == length(vertices), do: calculateIndices(vertices, indices, i1 + 1, 0)
-  def calculateIndices(vertices, indices, i1, i2) when i2 < length(vertices) do
-    case {shared(Enum.at(vertices, i1), Enum.at(vertices, i2)), [i2, i1] in indices} do
-      {2, false} -> calculateIndices(vertices, indices ++ [[i1, i2]], i1, i2 + 1)
-      _ -> calculateIndices(vertices, indices, i1, i2 + 1)
+  
+  def calculateConnects(vertices, indices, i1, _i2) when i1 == length(vertices), do: indices
+  def calculateConnects(vertices, indices, i1, i2) when i2 == length(vertices), do: calculateConnects(vertices, indices, i1 + 1, 0)
+  def calculateConnects(vertices, indices, i1, i2) when i2 < length(vertices) do
+    case {twoSharedDims(Enum.at(vertices, i1), Enum.at(vertices, i2)), [i2, i1] in indices} do
+      {2, false} -> calculateConnects(vertices, indices ++ [[i1, i2]], i1, i2 + 1)
+      _ -> calculateConnects(vertices, indices, i1, i2 + 1)
     end
   end
   
-  def shared(v1, v2), do: Enum.sum(for i <- 0..(length(v1) - 1), do: (if Enum.at(v1, i) == Enum.at(v2, i), do: 1, else: 0))
+  def twoSharedDims(v1, v2), do: Enum.sum(for i <- 0..(length(v1) - 1), do: (if Enum.at(v1, i) == Enum.at(v2, i), do: 1, else: 0))
 
   def loop(vertices, connect, sin, cos) do
     rot = vertices |> Enum.map(fn [x, y, z] ->
@@ -28,13 +29,12 @@ defmodule Cube do
   def draw(vertices, connect) do
     Enum.map(connect, fn pair -> 
       [[x1, y1, _z1], [x2, y2, _z2]] = Enum.map(pair, fn i -> Enum.at(vertices, i) end)
-      yScale = 0.6
-      [screenY1, screenY2] = Enum.map([y1, y2], fn y -> round(elem(:io.rows(), 1) / 2 - y * yScale) end)
-      [screenX1, screenX2] = Enum.map([x1, x2], fn x -> round(x + elem(:io.columns(), 1) / 2) end)
+      [screenY1, screenY2] = Enum.map([y1, y2], fn y -> round(elem(:io.rows(), 1)/2 - y*0.6) end) # 0.6 = y scaling factor
+      [screenX1, screenX2] = Enum.map([x1, x2], fn x -> round(x + elem(:io.columns(), 1)/2) end)
       d = round(:math.sqrt(:math.pow((screenX2 - screenX1), 2) + :math.pow((screenY2 - screenY1), 2)))
       for s <- 0..d do
-        t = if d == 0, do: 0, else: s / d
-        [x, y] = Enum.map([{screenX1, screenX2}, {screenY1, screenY2}], fn p -> round(elem(p, 0) + t * (elem(p, 1) - elem(p, 0))) end)
+        t = if d == 0, do: 0, else: s/d
+        [x, y] = Enum.map([{screenX1, screenX2}, {screenY1, screenY2}], fn p -> round(elem(p, 0) + t*(elem(p, 1) - elem(p, 0))) end)
         IO.ANSI.cursor(y, x) <> "█" |> IO.write()
       end
     end)
