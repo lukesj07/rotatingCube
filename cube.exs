@@ -27,13 +27,8 @@ defmodule Cube do
   def shared(v1, v2), do: Enum.sum(for i <- 0..(length(v1) - 1), do: (if Enum.at(v1, i) == Enum.at(v2, i), do: 1, else: 0))
 
   def loop(vertices, connect, sin, cos) do
-    rot = Enum.map(vertices, fn vertex ->
-      [x, y, z] = vertex
-      p = []
-      p = [calculateZ(x, y, z, sin, cos) | p]
-      p = [calculateY(x, y, z, sin, cos) | p]
-      p = [calculateX(x, y, z, sin, cos) | p]
-      p
+    rot = vertices |> Enum.map(fn [x, y, z] ->
+      [calculateX(x, y, z, sin, cos), calculateY(x, y, z, sin, cos), calculateZ(x, y, z, sin, cos)]
     end)
     draw(rot, connect)
     loop(rot, connect, sin, cos)
