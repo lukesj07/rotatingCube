@@ -3,19 +3,19 @@ defmodule Cube do
     vertices = for x <- [-10, 10], y <- [-10, 10], z <- [-10, 10], do: [x, y, z]
     {a, b, c} = {0.01, 0.06, 0.03}
     IO.write("\e[?25l")
-    loop(vertices, calculateIndices(vertices, [], 0, 0), Enum.map([a, b, c], & :math.sin/1), Enum.map([a, b, c], & :math.cos/1))
+    loop(vertices, calculateConnects(vertices, [], 0, 0), Enum.map([a, b, c], & :math.sin/1), Enum.map([a, b, c], & :math.cos/1))
   end
-
-  def calculateIndices(vertices, indices, i1, _i2) when i1 == length(vertices), do: indices
-  def calculateIndices(vertices, indices, i1, i2) when i2 == length(vertices), do: calculateIndices(vertices, indices, i1 + 1, 0)
-  def calculateIndices(vertices, indices, i1, i2) when i2 < length(vertices) do
-    case {shared(Enum.at(vertices, i1), Enum.at(vertices, i2)), [i2, i1] in indices} do
-      {2, false} -> calculateIndices(vertices, indices ++ [[i1, i2]], i1, i2 + 1)
-      _ -> calculateIndices(vertices, indices, i1, i2 + 1)
+  
+  def calculateConnects(vertices, indices, i1, _i2) when i1 == length(vertices), do: indices
+  def calculateConnects(vertices, indices, i1, i2) when i2 == length(vertices), do: calculateConnects(vertices, indices, i1 + 1, 0)
+  def calculateConnects(vertices, indices, i1, i2) when i2 < length(vertices) do
+    case {twoSharedDims(Enum.at(vertices, i1), Enum.at(vertices, i2)), [i2, i1] in indices} do
+      {2, false} -> calculateConnects(vertices, indices ++ [[i1, i2]], i1, i2 + 1)
+      _ -> calculateConnects(vertices, indices, i1, i2 + 1)
     end
   end
   
-  def shared(v1, v2), do: Enum.sum(for i <- 0..(length(v1) - 1), do: (if Enum.at(v1, i) == Enum.at(v2, i), do: 1, else: 0))
+  def twoSharedDims(v1, v2), do: Enum.sum(for i <- 0..(length(v1) - 1), do: (if Enum.at(v1, i) == Enum.at(v2, i), do: 1, else: 0))
 
   def loop(vertices, connect, sin, cos) do
     rot = vertices |> Enum.map(fn [x, y, z] ->
