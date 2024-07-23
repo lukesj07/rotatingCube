@@ -1,15 +1,6 @@
 defmodule Cube do
   def main() do
-    vertices = [
-      [-10, 10, 10],
-      [-10, -10, 10],
-      [10, 10, 10],
-      [10, -10, 10],
-      [-10, 10, -10],
-      [-10, -10, -10],
-      [10, 10, -10],
-      [10, -10, -10]
-    ]
+    vertices = for x <- [-10, 10], y <- [-10, 10], z <- [-10, 10], do: [x, y, z]
     {a, b, c} = {0.01, 0.06, 0.03}
     IO.write("\e[?25l")
     loop(vertices, calculateIndices(vertices, [], 0, 0), Enum.map([a, b, c], & :math.sin/1), Enum.map([a, b, c], & :math.cos/1))
