@@ -1,7 +1,8 @@
 defmodule Cube do
   def main() do
-    vertices = for x <- [-10, 10], y <- [-10, 10], z <- [-10, 10], do: [x, y, z]
     {a, b, c} = {0.01, 0.06, 0.03}
+    {halfX, halfY, halfZ} = {10, 10, 10}
+    vertices = for x <- [-halfX, halfX], y <- [-halfY, halfY], z <- [-halfZ, halfZ], do: [x, y, z]
     IO.write("\e[?25l")
     loop(vertices, calculateConnects(vertices, [], 0, 0), Enum.map([a, b, c], & :math.sin/1), Enum.map([a, b, c], & :math.cos/1))
   end
@@ -28,13 +29,12 @@ defmodule Cube do
   def draw(vertices, connect) do
     Enum.map(connect, fn pair -> 
       [[x1, y1, _z1], [x2, y2, _z2]] = Enum.map(pair, fn i -> Enum.at(vertices, i) end)
-      yScale = 0.6
-      [screenY1, screenY2] = Enum.map([y1, y2], fn y -> round(elem(:io.rows(), 1) / 2 - y * yScale) end)
-      [screenX1, screenX2] = Enum.map([x1, x2], fn x -> round(x + elem(:io.columns(), 1) / 2) end)
+      [screenY1, screenY2] = Enum.map([y1, y2], fn y -> round(elem(:io.rows(), 1)/2 - y*0.6) end) # 0.6 = y scaling factor
+      [screenX1, screenX2] = Enum.map([x1, x2], fn x -> round(x + elem(:io.columns(), 1)/2) end)
       d = round(:math.sqrt(:math.pow((screenX2 - screenX1), 2) + :math.pow((screenY2 - screenY1), 2)))
       for s <- 0..d do
-        t = if d == 0, do: 0, else: s / d
-        [x, y] = Enum.map([{screenX1, screenX2}, {screenY1, screenY2}], fn p -> round(elem(p, 0) + t * (elem(p, 1) - elem(p, 0))) end)
+        t = if d == 0, do: 0, else: s/d
+        [x, y] = Enum.map([{screenX1, screenX2}, {screenY1, screenY2}], fn p -> round(elem(p, 0) + t*(elem(p, 1) - elem(p, 0))) end)
         IO.ANSI.cursor(y, x) <> "█" |> IO.write()
       end
     end)
