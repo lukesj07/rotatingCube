@@ -28,9 +28,12 @@ defmodule Cube do
 
   def draw(vertices, connect) do
     Enum.map(connect, fn pair -> 
-      [[x1, y1, _z1], [x2, y2, _z2]] = Enum.map(pair, fn i -> Enum.at(vertices, i) end)
-      [screenY1, screenY2] = Enum.map([y1, y2], fn y -> round(elem(:io.rows(), 1)/2 - y*0.6) end) # 0.6 = y scaling factor
-      [screenX1, screenX2] = Enum.map([x1, x2], fn x -> round(x + elem(:io.columns(), 1)/2) end)
+      [[x1, y1, z1], [x2, y2, z2]] = Enum.map(pair, fn i -> Enum.at(vertices, i) end)
+      #[screenY1, screenY2] = Enum.map([y1, y2], fn y -> round(elem(:io.rows(), 1)/2 - y*0.6) end) # 0.6 = y scaling factor
+      #[screenX1, screenX2] = Enum.map([x1, x2], fn x -> round(x + elem(:io.columns(), 1)/2) end)
+      #15 is focal length, 25 is focal length + some initial offset to stop cube from "coming out of screen"
+      [screenY1, screenY2] = Enum.map([{y1, z1}, {y2, z2}], fn yz -> round(elem(:io.rows(), 1)/2 - (elem(yz, 0) * 15)/(25 - elem(yz, 1))) end)
+      [screenX1, screenX2] = Enum.map([{x1, z1}, {x2, z2}], fn xz -> round((elem(xz, 0) * 15)/(25 - elem(xz, 1)) + elem(:io.columns(), 1)/2) end)
       d = round(:math.sqrt(:math.pow((screenX2 - screenX1), 2) + :math.pow((screenY2 - screenY1), 2)))
       for s <- 0..d do
         t = if d == 0, do: 0, else: s/d
